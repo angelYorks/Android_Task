@@ -1,5 +1,6 @@
 package com.aplicacionTask.data
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -7,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.aplicacionTask.data.adapter.TaskAdapter
 import com.aplicacionTask.data.local.AppDataBase
 import com.aplicacionTask.data.local.entity.Task
 import com.aplicacionTask.data.repository.TaskRepository
@@ -27,14 +31,37 @@ class Activity : AppCompatActivity() {
        TaskViewModelFactory(repository)
     }
 
+    private lateinit var taskAdapter: TaskAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_)
 
+        // configuracion del recyclerview
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewtasks)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        taskAdapter = TaskAdapter(emptyList()){ task ->
+            // logica para algo
+            taskViewModel.deleteTask(task)
+        }
+
+        recyclerView.adapter = taskAdapter
+
+        taskViewModel.tasks.observe(this, { tasks ->
+            taskAdapter = TaskAdapter(tasks){ task ->
+                taskViewModel.deleteTask(task)
+            }
+            recyclerView.adapter = taskAdapter
+        })
+
+        taskViewModel.fetchTasks()
+
         val btnInsert = findViewById<AppCompatButton>(R.id.circular_button)
         btnInsert.setOnClickListener{
             insertTask()
+
         }
 
 
@@ -45,6 +72,7 @@ class Activity : AppCompatActivity() {
         }
     }
 
+
     private fun insertTask(){
         val newTask = Task(
             title = "nueva tarea",
@@ -52,6 +80,13 @@ class Activity : AppCompatActivity() {
         )
 
         taskViewModel.insertTask(newTask)
+
+        taskViewModel.getLastInsertedTaskId()?.let{ taskId ->
+            val intent = Intent(this, Editor::class.java).apply {
+                putExtra("TASK_ID", taskId)
+            }
+            startActivity(intent)
+        }
 
     }
 

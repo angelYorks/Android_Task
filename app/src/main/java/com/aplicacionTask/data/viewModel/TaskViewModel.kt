@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class TaskViewModel(private val taskRepository: TaskRepository): ViewModel() {
     private val _taks = MutableLiveData<List<Task>>()
-    val task: LiveData<List<Task>> get() = _taks
+    val tasks: LiveData<List<Task>> get() = _taks
 
     fun fetchTasks(){
         viewModelScope.launch {
@@ -38,6 +38,10 @@ class TaskViewModel(private val taskRepository: TaskRepository): ViewModel() {
             taskRepository.deleteTask(task)
             fetchTasks()
         }
+    }
+
+    fun getLastInsertedTaskId():Int?{
+        return _taks.value?.lastOrNull()?.id
     }
 
 

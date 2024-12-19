@@ -9,6 +9,10 @@ android {
     namespace = "com.example.task"
     compileSdk = 35
 
+    viewBinding{
+        enable = true
+    }
+
     defaultConfig {
         applicationId = "com.example.task"
         minSdk = 27
@@ -60,6 +64,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.compose.material.material)
     implementation(libs.androidx.compose.material3.material32)
+    implementation(libs.androidx.activity)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.appcompat)
