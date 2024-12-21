@@ -60,8 +60,7 @@ class Activity : AppCompatActivity() {
 
         val btnInsert = findViewById<AppCompatButton>(R.id.circular_button)
         btnInsert.setOnClickListener{
-            insertTask()
-
+            insertNewTask()
         }
 
 
@@ -73,21 +72,8 @@ class Activity : AppCompatActivity() {
     }
 
 
-    private fun insertTask(){
-        val newTask = Task(
-            title = "nueva tarea",
-            description = "descripcion de la nueva tarea"
-        )
-
-        taskViewModel.insertTask(newTask)
-
-        taskViewModel.getLastInsertedTaskId()?.let{ taskId ->
-            val intent = Intent(this, Editor::class.java).apply {
-                putExtra("TASK_ID", taskId)
-            }
-            startActivity(intent)
-        }
-
+    private fun insertNewTask() {
+        val intent = Intent(this, Editor::class.java)
+        startActivity(intent)
     }
-
 }
