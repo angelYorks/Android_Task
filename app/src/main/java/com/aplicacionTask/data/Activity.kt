@@ -20,15 +20,15 @@ import com.example.task.R
 
 class Activity : AppCompatActivity() {
 
-    // instancia el repositorio con la base de datos
-    private val repository: TaskRepository by lazy{
+    // Instancia el repositorio con la base de datos
+    private val repository: TaskRepository by lazy {
         val dataBase = AppDataBase.getDataBase(applicationContext)
         TaskRepository(dataBase.taskDao())
     }
 
-    // instancia el viewmodel a partir del repositorio instanciado
+    // Instancia el viewmodel a partir del repositorio instanciado
     private val taskViewModel: TaskViewModel by viewModels {
-       TaskViewModelFactory(repository)
+        TaskViewModelFactory(repository)
     }
 
     private lateinit var taskAdapter: TaskAdapter
@@ -38,31 +38,32 @@ class Activity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_)
 
-        // configuracion del recyclerview
+        // Configuración del RecyclerView
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewtasks)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        taskAdapter = TaskAdapter(emptyList()){ task ->
-            // logica para algo
+        taskAdapter = TaskAdapter(emptyList()) { task ->
+            // Lógica para eliminar tarea
             taskViewModel.deleteTask(task)
         }
 
         recyclerView.adapter = taskAdapter
 
+        // Observa los cambios en las tareas
         taskViewModel.tasks.observe(this, { tasks ->
-            taskAdapter = TaskAdapter(tasks){ task ->
+            taskAdapter = TaskAdapter(tasks) { task ->
                 taskViewModel.deleteTask(task)
             }
             recyclerView.adapter = taskAdapter
         })
 
+        // Carga las tareas al inicio
         taskViewModel.fetchTasks()
 
         val btnInsert = findViewById<AppCompatButton>(R.id.circular_button)
-        btnInsert.setOnClickListener{
+        btnInsert.setOnClickListener {
             insertNewTask()
         }
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -72,19 +73,22 @@ class Activity : AppCompatActivity() {
     }
 
     private fun insertNewTask() {
-
         val newTask = Task(
-            title = "nueva tarea",
-            description = "descripcion de la nueva tarea"
+            title = "",  // Cambia el título predeterminado si es necesario
+            description = ""  // Cambia la descripción predeterminada si es necesario
         )
 
-        taskViewModel.insertTask(newTask){ taskId ->
-
+        taskViewModel.insertTask(newTask) { taskId ->
             val intent = Intent(this, Editor::class.java).apply {
                 putExtra("TASK_ID", taskId)
-
             }
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        taskViewModel.fetchTasks()
     }
 }
