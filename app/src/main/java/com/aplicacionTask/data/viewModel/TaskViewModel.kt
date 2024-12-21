@@ -1,5 +1,6 @@
 package com.aplicacionTask.data.viewModel
 
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,16 +20,17 @@ class TaskViewModel(private val taskRepository: TaskRepository): ViewModel() {
         }
     }
 
-    fun insertTask(task: Task){
+    fun insertTask(task: Task, onTaskInserted: (Long) -> Unit){
         viewModelScope.launch {
-            taskRepository.insertTask(task)
+            val taskId = taskRepository.insertTask(task)
+            onTaskInserted(taskId)
             fetchTasks()
         }
     }
 
     fun updateTask(task: Task){
         viewModelScope.launch {
-            taskRepository.insertTask(task)
+            taskRepository.updateTask(task)
             fetchTasks()
         }
     }
@@ -39,11 +41,5 @@ class TaskViewModel(private val taskRepository: TaskRepository): ViewModel() {
             fetchTasks()
         }
     }
-
-    fun getLastInsertedTaskId():Int?{
-        return _taks.value?.lastOrNull()?.id
-    }
-
-
 
 }

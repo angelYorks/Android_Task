@@ -71,9 +71,20 @@ class Activity : AppCompatActivity() {
         }
     }
 
-
     private fun insertNewTask() {
-        val intent = Intent(this, Editor::class.java)
-        startActivity(intent)
+
+        val newTask = Task(
+            title = "nueva tarea",
+            description = "descripcion de la nueva tarea"
+        )
+
+        taskViewModel.insertTask(newTask){ taskId ->
+
+            val intent = Intent(this, Editor::class.java).apply {
+                putExtra("TASK_ID", taskId)
+
+            }
+            startActivity(intent)
+        }
     }
 }
